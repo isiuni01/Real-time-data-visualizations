@@ -4,6 +4,7 @@ services:
     hostname: kafka
     ports:
       - "9091:9091"
+      - "9308:9308"  # JMX metrics port
     environment:
       KAFKA_LISTENERS: INTERNAL://kafka:19091,EXTERNAL://0.0.0.0:9091
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19091,EXTERNAL://localhost:9091
@@ -12,8 +13,14 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # JMX configuration for Prometheus
+      KAFKA_JMX_HOSTNAME: kafka
+      KAFKA_JMX_PORT: 9999
+      KAFKA_OPTS: "-javaagent:/opt/jmx_prometheus_javaagent.jar=9308:/opt/kafka-jmx-config.yml"
     volumes:
       - kafka-data:/var/lib/kafka/data
+      - ./jmx_prometheus_javaagent.jar:/opt/jmx_prometheus_javaagent.jar:ro
+      - ./kafka-jmx-config.yml:/opt/kafka-jmx-config.yml:ro
     depends_on:
       - zookeeper
 
@@ -79,16 +86,33 @@ services:
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    depends_on:
+      - kafka
+      - grafana
+
     
   jobmanager:
     image: myflink
     ports:
       - "8081:8081"
+      - "9249:9249"  # Prometheus metrics port
     command: jobmanager
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager    
+    volumes:
+      - ./flink-conf.yaml:/opt/flink/conf/config.yaml:ro
    
 
   taskmanager:
@@ -97,11 +121,10 @@ services:
       - jobmanager
     command: taskmanager
     scale: 1
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 2    
+    ports:
+      - "9250:9249"  # Prometheus metrics port (different from jobmanager)
+    volumes:
+      - ./flink-conf.yaml:/opt/flink/conf/config.yaml:ro
 
 
   sql-client:
@@ -121,3 +144,4 @@ volumes:
   zookeeper-data:
   zookeeper-datalog:
   influxdb-storage:
+  prometheus-data:

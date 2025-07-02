@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Kafka JMX metrics (requires JMX exporter)
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:9308']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Flink metrics
+  - job_name: 'flink-jobmanager'
+    static_configs:
+      - targets: ['jobmanager:9249']
+    scrape_interval: 30s
+
+  - job_name: 'flink-taskmanager'
+    static_configs:
+      - targets: ['taskmanager:9249']
+    scrape_interval: 30s
+
+  # InfluxDB metrics
+  - job_name: 'influxdb'
+    static_configs:
+      - targets: ['influxdb:8086']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Telegraf metrics (if Prometheus output is enabled)
+  - job_name: 'telegraf'
+    static_configs:
+      - targets: ['telegraf:9273']
+    scrape_interval: 30s

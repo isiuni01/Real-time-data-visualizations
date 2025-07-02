@@ -56,7 +56,8 @@ CREATE TABLE KafkaBoatData (
   'scan.startup.mode' = 'earliest-offset',
   'format' = 'json',
   'json.ignore-parse-errors' = 'true',
-  'json.timestamp-format.standard' = 'ISO-8601'
+  'json.timestamp-format.standard' = 'ISO-8601',
+  'properties.group.id' = 'job'
 );
 
 
@@ -77,7 +78,8 @@ CREATE TABLE Navigation (
   'topic' = 'boat_data_navigation',
   'properties.bootstrap.servers' = 'kafka:19091',
   'format' = 'json',
-  'json.timestamp-format.standard' = 'ISO-8601'
+  'json.timestamp-format.standard' = 'ISO-8601',
+  'sink.transactional-id-prefix' = 'navigation-sink'
 );
 
 INSERT INTO Navigation

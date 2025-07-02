@@ -31,8 +31,8 @@ BOAT2 = "SUI"
 RACE_NAME = "RR1_Match_1"
 
 # Kafka configuration
-KAFKA_TOPIC = "boat_racing_data"
-KAFKA_SERVER = "localhost:9092"
+KAFKA_TOPIC = "boat_data"
+KAFKA_SERVER = "localhost:9091"
 
 # Data folder
 DATA_FOLDER = Path("orderedData")
@@ -65,7 +65,6 @@ def load_boat_data(boat_name):
         # Read CSV with '|' separator (based on the data structure we observed)
         df = pl.read_csv(
             csv_file,
-            separator='|',
             has_header=True,
             ignore_errors=True
         )
@@ -79,18 +78,18 @@ def load_boat_data(boat_name):
 
 def filter_data(df, opponent_boat, race_name, boat_name):
     """Filter DataFrame based on opponent and race."""
-    print(f"🔍 [Thread-{boat_name}] Filtering data where opponent={opponent_boat} and race={race_name}")
+    print(f"🔍 [Thread-{boat_name}] Filtering data where opponent={opponent_boat} and race_number={race_name}")
     
     # Check if required columns exist
     if 'opponent' not in df.columns:
         raise ValueError("'opponent' column not found in the data!")
-    if 'race' not in df.columns:
-        raise ValueError("'race' column not found in the data!")
+    if 'race_number' not in df.columns:
+        raise ValueError("'race_number' column not found in the data!")
     
     # Filter data
     filtered_df = df.filter(
         (pl.col('opponent') == opponent_boat) & 
-        (pl.col('race') == race_name)
+        (pl.col('race_number') == race_name)
     )
     
     print(f"   [Thread-{boat_name}] Found {len(filtered_df)} matching rows")

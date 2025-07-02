@@ -1,5 +1,5 @@
 
-CREATE TABLE KafkaBoatData (
+CREATE TABLE KafkaBoatData2 (
   asset_id STRING,
   `timestamp` STRING,
   source STRING,
@@ -56,7 +56,8 @@ CREATE TABLE KafkaBoatData (
   'scan.startup.mode' = 'earliest-offset',
   'format' = 'json',
   'json.ignore-parse-errors' = 'true',
-  'json.timestamp-format.standard' = 'ISO-8601'
+  'json.timestamp-format.standard' = 'ISO-8601',
+  'properties.group.id' = 'job2'
 );
 
 
@@ -95,10 +96,11 @@ CREATE TABLE BoatRaceData (
   maneuver STRING
 ) WITH (
   'connector' = 'kafka',
-  'topic' = 'boat_race_visualization',
+  'topic' = 'boat_race_data',
   'properties.bootstrap.servers' = 'kafka:19091',
   'format' = 'json',
-  'json.timestamp-format.standard' = 'ISO-8601'
+  'json.timestamp-format.standard' = 'ISO-8601',
+  'sink.transactional-id-prefix' = 'boat-race-data-sink'
 );
 
 INSERT INTO BoatRaceData
