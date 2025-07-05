@@ -26,13 +26,6 @@ scrape_configs:
       - targets: ['taskmanager:9249']
     scrape_interval: 30s
 
-  # InfluxDB metrics
-  - job_name: 'influxdb'
-    static_configs:
-      - targets: ['influxdb:8086']
-    metrics_path: /metrics
-    scrape_interval: 30s
-
   # Telegraf metrics (if Prometheus output is enabled)
   - job_name: 'telegraf'
     static_configs:

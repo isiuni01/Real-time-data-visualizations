@@ -75,11 +75,14 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=my-org
       - DOCKER_INFLUXDB_INIT_BUCKET=flink-data
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-token
+      - INFLUXD_REPORTING_DISABLED=false
     volumes:
       - influxdb-storage:/var/lib/influxdb2
 
   telegraf:
     image: telegraf:1.30
+    ports:
+      - "9273:9273"  # Prometheus metrics port
     depends_on:
       - kafka
       - influxdb

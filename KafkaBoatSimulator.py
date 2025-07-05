@@ -23,7 +23,7 @@ import time
 # =============================================================================
 
 # Number of boats to simulate
-N_BOATS = 100  # Set this to your desired number of simulated boats
+N_BOATS = 10000  # Set this to your desired number of simulated boats
 
 # Thread pool configuration
 MAX_WORKER_THREADS = 20  # Number of worker threads in the pool

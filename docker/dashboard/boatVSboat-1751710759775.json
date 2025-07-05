@@ -1,0 +1,776 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "eepnkp443ynswc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "Layer 0",
+          "type": "osm-standard"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": true,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "showLegend": true,
+              "style": {
+                "color": {
+                  "fixed": "red"
+                },
+                "opacity": 0.3,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 5,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "textConfig": {
+                  "fontSize": 12,
+                  "offsetX": 0,
+                  "offsetY": 0,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "filterData": {
+              "id": "byRefId",
+              "options": "B"
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "boat2",
+            "tooltip": true,
+            "type": "markers"
+          },
+          {
+            "config": {
+              "showLegend": true,
+              "style": {
+                "color": {
+                  "fixed": "dark-green"
+                },
+                "opacity": 0.3,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 5,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/square.svg",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "textConfig": {
+                  "fontSize": 12,
+                  "offsetX": 0,
+                  "offsetY": 0,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "filterData": {
+              "id": "byRefId",
+              "options": "A"
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "boat",
+            "tooltip": true,
+            "type": "markers"
+          }
+        ],
+        "tooltip": {
+          "mode": "details"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "zero",
+          "lat": 0,
+          "lon": 0,
+          "zoom": 1
+        }
+      },
+      "pluginVersion": "12.0.1+security-01",
+      "targets": [
+        {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -3m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    (r._field == \"latitude\" or r._field == \"longitude\") and\n    r.boat == \"${boat}\" and\n    r.opponent == \"${boat2}\"\n  )\n  |> aggregateWindow(every: 1s, fn: last)\n  |> pivot(rowKey:[\"_time\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns: [\"_time\", \"latitude\", \"longitude\", \"boat\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "eepnkp443ynswc"
+          },
+          "hide": false,
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -3m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    (r._field == \"latitude\" or r._field == \"longitude\") and\n    r.boat == \"${boat2}\" and\n    r.opponent == \"${boat}\"\n  )\n  |> aggregateWindow(every: 1s, fn: last)\n  |> pivot(rowKey:[\"_time\"], columnKey:[\"_field\"], valueColumn:\"_value\")\n  |> keep(columns: [\"_time\", \"latitude\", \"longitude\", \"boat\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Map",
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "eepnkp443ynswc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "velocityknot"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.0.1+security-01",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "eepnkp443ynswc"
+          },
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -1h)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_speed\" and\n    r.boat == \"${boat}\" and\n    r.opponent == \"${boat2}\")\n\n",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "eepnkp443ynswc"
+          },
+          "hide": false,
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -1h)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_speed\" and\n    r.boat == \"${boat2}\" and\n    r.opponent == \"${boat}\")\n\n",
+          "refId": "B"
+        }
+      ],
+      "title": "Velocità",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "eepnkp443ynswc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-BlPu"
+          },
+          "mappings": [],
+          "max": 20,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "velocityknot"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "id": 4,
+      "maxPerRow": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.1+security-01",
+      "targets": [
+        {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -5m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_true_wind_speed\" and\n    r.boat == \"${boat}\" and r.opponent == \"${boat2}\"\n    )\n\n      |> map(fn: (r) => ({ r with _field: \"Velocità vento ${boat}\" }))",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "eepnkp443ynswc"
+          },
+          "hide": false,
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -5m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_true_wind_speed\" and\n    r.boat == \"${boat2}\" and r.opponent == \"${boat}\"\n    )\n\n      |> map(fn: (r) => ({ r with _field: \"Velocità vento ${boat2}\" }))",
+          "refId": "B"
+        }
+      ],
+      "title": "Wind speed",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "eepnkp443ynswc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "transparent",
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 0,
+                  "text": "Displacement"
+                },
+                "1": {
+                  "index": 1,
+                  "text": "Foiling"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.1+security-01",
+      "targets": [
+        {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -1h)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"is_foiling\" and\n    r.boat == \"${boat}\" and\n    r.opponent == \"${boat2}\")\n\n        |> map(fn: (r) => ({ r with _field: \"${boat}\" }))",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "eepnkp443ynswc"
+          },
+          "hide": false,
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -1h)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"is_foiling\" and\n    r.boat == \"${boat}\" and\n    r.opponent == \"${boat2}\")\n\n    |> map(fn: (r) => ({ r with _field: \"${boat2}\" }))",
+          "refId": "B"
+        }
+      ],
+      "title": "Boat status",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "eepnkp443ynswc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 60,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "velocityknot"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 22
+      },
+      "id": 3,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.0.1+security-01",
+      "targets": [
+        {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -10m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_speed\" and\n    r.boat == \"${boat}\" and r.opponent == \"${boat2}\"\n    )\n\n      |> map(fn: (r) => ({ r with _field: \"Velocità ${boat}\" }))",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "eepnkp443ynswc"
+          },
+          "hide": false,
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -10m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_speed\" and\n    r.boat == \"${boat2}\" and r.opponent == \"${boat}\"\n    )\n\n      |> map(fn: (r) => ({ r with _field: \"Velocità ${boat2}\" }))",
+          "refId": "B"
+        }
+      ],
+      "title": "Velocità",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "eepnkp443ynswc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 60,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "velocityknot"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 22
+      },
+      "id": 8,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "12.0.1+security-01",
+      "targets": [
+        {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -10m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_vmg\" and\n    r.boat == \"${boat}\" and r.opponent == \"${boat2}\"\n    )\n\n      |> map(fn: (r) => ({ r with _field: \"VMG ${boat}\" }))",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "eepnkp443ynswc"
+          },
+          "hide": false,
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -10m)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"avg_vmg\" and\n    r.boat == \"${boat2}\" and r.opponent == \"${boat}\"\n    )\n\n      |> map(fn: (r) => ({ r with _field: \"VMG ${boat2}\" }))",
+          "refId": "B"
+        }
+      ],
+      "title": "VMG",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "eepnkp443ynswc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "transparent",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 0,
+                  "text": "prestart"
+                },
+                "1": {
+                  "index": 1,
+                  "text": "Upwind 1"
+                },
+                "2": {
+                  "index": 2,
+                  "text": "Downwind 1 "
+                },
+                "3": {
+                  "index": 3,
+                  "text": "Upwind 2"
+                },
+                "4": {
+                  "index": 4,
+                  "text": "Downwind 2"
+                },
+                "5": {
+                  "index": 5,
+                  "text": "Upwind 3"
+                },
+                "6": {
+                  "index": 6,
+                  "text": "Downwind 3"
+                },
+                "7": {
+                  "index": 7,
+                  "text": "Upwind 4"
+                },
+                "8": {
+                  "index": 8,
+                  "text": "Downwind 4"
+                },
+                "10": {
+                  "index": 9,
+                  "text": "Post race"
+                },
+                "-1": {
+                  "index": 10,
+                  "text": "Unknow"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 30
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.1+security-01",
+      "targets": [
+        {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -1h)\n  |> filter(fn: (r) =>\n    r._measurement == \"BoatvsBoat\" and\n    r._field == \"leg_number\" and\n    r.boat == \"${boat}\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Race status",
+      "type": "stat"
+    }
+  ],
+  "preload": false,
+  "refresh": "5s",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "FRA",
+          "value": "FRA"
+        },
+        "definition": "from(bucket: \"Navigation\")\n  |> range(start: -3h) // o -1y per dati più vecchi\n  |> filter(fn: (r) => r._measurement == \"navigazione\")  // <-- qui specifichi il measurement\n  |> keep(columns: [\"boat\"])  // tieni solo il tag che ti interessa\n  |> distinct(column: \"boat\")  // prendi solo i valori unici",
+        "description": "",
+        "name": "boat",
+        "options": [],
+        "query": {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -3h) // o -1y per dati più vecchi\n  |> filter(fn: (r) => r._measurement == \"navigazione\")  // <-- qui specifichi il measurement\n  |> keep(columns: [\"boat\"])  // tieni solo il tag che ti interessa\n  |> distinct(column: \"boat\")  // prendi solo i valori unici"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": "SUI",
+          "value": "SUI"
+        },
+        "definition": "from(bucket: \"Navigation\")\n  |> range(start: -3h) // o -1y per dati più vecchi\n  |> filter(fn: (r) => r._measurement == \"navigazione\")  // <-- qui specifichi il measurement\n  |> keep(columns: [\"boat\"])  // tieni solo il tag che ti interessa\n  |> distinct(column: \"boat\")  // prendi solo i valori unici",
+        "description": "",
+        "name": "boat2",
+        "options": [],
+        "query": {
+          "query": "from(bucket: \"Navigation\")\n  |> range(start: -3h) // o -1y per dati più vecchi\n  |> filter(fn: (r) => r._measurement == \"navigazione\")  // <-- qui specifichi il measurement\n  |> keep(columns: [\"boat\"])  // tieni solo il tag che ti interessa\n  |> distinct(column: \"boat\")  // prendi solo i valori unici"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s"
+    ]
+  },
+  "timezone": "browser",
+  "title": "boatVSboat",
+  "uid": "1158de88-5925-4835-a257-5a80dc805e12",
+  "version": 21
+}
