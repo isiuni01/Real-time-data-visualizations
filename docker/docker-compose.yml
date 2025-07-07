@@ -17,6 +17,15 @@ services:
       KAFKA_JMX_HOSTNAME: kafka
       KAFKA_JMX_PORT: 9999
       KAFKA_OPTS: "-javaagent:/opt/jmx_prometheus_javaagent.jar=9308:/opt/kafka-jmx-config.yml"
+    # Resource limits for stress testing - BALANCED CONFIG
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'      # More CPU for Kafka as message broker
+          memory: 1G       # Adequate memory for Kafka operations
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     volumes:
       - kafka-data:/var/lib/kafka/data
       - ./jmx_prometheus_javaagent.jar:/opt/jmx_prometheus_javaagent.jar:ro
@@ -76,6 +85,15 @@ services:
       - DOCKER_INFLUXDB_INIT_BUCKET=flink-data
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-token
       - INFLUXD_REPORTING_DISABLED=false
+    # Resource limits for database stress testing
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'      # More CPU for Kafka as message broker
+          memory: 1G       # Adequate memory for Kafka operations
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     volumes:
       - influxdb-storage:/var/lib/influxdb2
 
@@ -114,6 +132,15 @@ services:
       - "8081:8081"
       - "9249:9249"  # Prometheus metrics port
     command: jobmanager
+    # Resource limits for Flink job manager - BALANCED CONFIG
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'      # More CPU for Kafka as message broker
+          memory: 1G       # Adequate memory for Kafka operations
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     volumes:
       - ./flink-conf.yaml:/opt/flink/conf/config.yaml:ro
    
@@ -126,6 +153,15 @@ services:
     scale: 1
     ports:
       - "9250:9249"  # Prometheus metrics port (different from jobmanager)
+    # Resource limits for Flink task manager - BALANCED CONFIG
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'      # More CPU for Kafka as message broker
+          memory: 1G       # Adequate memory for Kafka operations
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     volumes:
       - ./flink-conf.yaml:/opt/flink/conf/config.yaml:ro
 

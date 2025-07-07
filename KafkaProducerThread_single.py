@@ -100,7 +100,7 @@ def invia_messaggi_a_kafka(file_path, start_row, end_row, topic_name):
                 if sent_count % 100 == 0:
                     print(f"   [Thread-{boat_name}] Sent {sent_count}/{total_rows} messages...")
                 
-                sleep(0.05)
+                sleep(0.01)
                 barrier.wait()  # Synchronize all threads
             
             print(f"✓ [Thread-{boat_name}] Completed {boat_name}: {sent_count} messages sent")
